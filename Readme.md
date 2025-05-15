@@ -4,6 +4,7 @@
 
 I have created this proyect to show how i woulda deploy the contenirized app in ECS using 
 the well known terraform (i did it all in my personal account i have for labs )
+Forgot to mention , i didnt set up cloudfrount yet just the ecs stuff
 
 
 
