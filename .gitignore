@@ -1,0 +1,14 @@
+**/.terraform
+.DS_Store
+**/terraform.tfstate*
+**/*.env
+!**/sample.env
+docker_config.json
+**/kubernetes/docker_secret.yml
+.idea/
+*.tfvars
+plan.json
+plan.out
+
+
+

@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - export TIMESTAMP=$(date +%s)
+  build:
+    commands:
+      - export IMAGE_TAG=latest
+      - echo "Building Docker image"
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      #- docker build -t $ECR_NAME .
+      - |
+        docker build --build-arg CONTAINER_NAME=$CONTAINER_NAME \
+          --build-arg AWS_ENVIRONMENT=$AWS_ENVIRONMENT \
+          --build-arg CONTAINER_NAME=$CONTAINER_NAME \
+          -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo "$CONTAINER_NAME"
+      - echo "$REPOSITORY_URI:$IMAGE_TAG"
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.json
+  post_build:
+    commands:
+      - echo "Pushing Docker image to Amazon ECR"
+artifacts:
+  files: imagedefinitions.json
